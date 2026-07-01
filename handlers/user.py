@@ -105,17 +105,15 @@ async def menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 reply_markup=main_menu_keyboard(is_admin(user_id))
             )
             return
-        text = "📋 *Ваши кампании:*
+        text = """📋 *Ваши кампании:*
 
-"
+"""
         for c in camps:
             name = c.get("name", "")
             cid = c.get("campaign_id", "")
             status = c.get("status", "")
-            text += f"• *{name}* `(ID: {cid})` — {status}
-"
-        text += "
-Выберите кампанию для управления:"
+            text = text + f"• *{name}* `(ID: {cid})` — {status}" + chr(10)
+        text = text + chr(10) + "Выберите кампанию для управления:"
         await query.edit_message_text(text, reply_markup=campaigns_keyboard(camps, "camp"), parse_mode="Markdown")
     elif data == "menu_schedule":
         camps = db.get_user_campaigns(user_id)
@@ -138,14 +136,12 @@ async def menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not camps:
             await query.edit_message_text("У вас нет кампаний для статистики.", reply_markup=main_menu_keyboard(is_admin(user_id)))
             return
-        text = "📊 *Статистика по кампаниям:*
+        text = """📊 *Статистика по кампаниям:*
 
-"
+"""
         for c in camps:
             stats = db.get_stats(c["campaign_id"])
-            text += f"• *{c['name']}*
-  Всего: {stats['total']} | ✅ {stats['success']} | ❌ {stats['failed']}
-"
+            text = text + f"• *{c['name']}*" + chr(10) + f"  Всего: {stats['total']} | ✅ {stats['success']} | ❌ {stats['failed']}" + chr(10)
         await query.edit_message_text(text, reply_markup=main_menu_keyboard(is_admin(user_id)), parse_mode="Markdown")
     elif data == "menu_guide":
         text = """📖 *Пошаговый гайд по работе с ботом*
@@ -247,11 +243,7 @@ Spintax: {'Да' if camp['spintax_enabled'] == '1' else 'Нет'}
     elif data.startswith("campstats_"):
         cid = data.replace("campstats_", "")
         stats = db.get_stats(cid)
-        text = f"📊 *Статистика кампании*
-
-Всего: {stats['total']}
-✅ Успешно: {stats['success']}
-❌ Ошибок: {stats['failed']}"
+        text = f"📊 *Статистика кампании*" + chr(10) + chr(10) + f"Всего: {stats['total']}" + chr(10) + f"✅ Успешно: {stats['success']}" + chr(10) + f"❌ Ошибок: {stats['failed']}"
         await query.edit_message_text(text, reply_markup=main_menu_keyboard(is_admin(user_id)), parse_mode="Markdown")
     elif data.startswith("delcamp_"):
         cid = data.replace("delcamp_", "")
@@ -339,7 +331,7 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
     elif state == "schedule_time":
         time_str = update.message.text.strip()
-        if not re.match(r"^\d{2}:\d{2}$", time_str):
+        if not re.match(r"^\\d{2}:\\d{2}$", time_str):
             await update.message.reply_text("❌ Неверный формат. Используйте HH:MM (например, 14:30)")
             return
         camp_id = context.user_data.get("scheduling_camp")
@@ -352,9 +344,7 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.user_data["schedule_days"] = []
         context.user_data["schedule_groups"] = []
         await update.message.reply_text(
-            f"✅ Расписание сохранено!
-Дни: {', '.join(days)}
-Время: {time_str}",
+            f"✅ Расписание сохранено!" + chr(10) + f"Дни: {', '.join(days)}" + chr(10) + f"Время: {time_str}",
             reply_markup=main_menu_keyboard(is_admin(user.id))
         )
     elif state == "broadcast":
@@ -380,9 +370,7 @@ async def video_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def ask_spintax(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["state"] = "camp_spintax"
     await update.message.reply_text(
-        "🔄 Использовать Spintax для уникализации текста?
-"
-        "(Пример: `{Привет|Здравствуй|Добрый день}, {мир|друзья}!`)",
+        "🔄 Использовать Spintax для уникализации текста?" + chr(10) + "(Пример: `{Привет|Здравствуй|Добрый день}, {мир|друзья}!`)",
         reply_markup=InlineKeyboardMarkup([
             [InlineKeyboardButton("✅ Да", callback_data="spintax_yes"),
              InlineKeyboardButton("❌ Нет", callback_data="spintax_no")]
@@ -414,10 +402,7 @@ async def spintax_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["camp_media_file_id"] = None
 
     await query.edit_message_text(
-        f"✅ Кампания *{name}* создана!
-ID: `{cid}`
-
-Теперь настройте расписание публикаций.",
+        f"✅ Кампания *{name}* создана!" + chr(10) + f"ID: `{cid}`" + chr(10) + chr(10) + "Теперь настройте расписание публикаций.",
         reply_markup=main_menu_keyboard(is_admin(user_id)),
         parse_mode="Markdown"
     )
@@ -431,9 +416,7 @@ async def skip_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def newcampaign_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["state"] = "camp_name"
-    await update.message.reply_text("🚀 *Создание кампании*
-
-Введите название кампании:", parse_mode="Markdown")
+    await update.message.reply_text("🚀 *Создание кампании*" + chr(10) + chr(10) + "Введите название кампании:", parse_mode="Markdown")
 
 async def mycampaigns_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
@@ -441,10 +424,9 @@ async def mycampaigns_command(update: Update, context: ContextTypes.DEFAULT_TYPE
     if not camps:
         await update.message.reply_text("У вас пока нет кампаний.")
         return
-    text = "📋 *Ваши кампании:*
+    text = """📋 *Ваши кампании:*
 
-"
+"""
     for c in camps:
-        text += f"• *{c['name']}* `(ID: {c['campaign_id']})` — {c['status']}
-"
+        text = text + f"• *{c['name']}* `(ID: {c['campaign_id']})` — {c['status']}" + chr(10)
     await update.message.reply_text(text, parse_mode="Markdown")

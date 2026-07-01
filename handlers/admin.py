@@ -64,32 +64,30 @@ async def admin_callback_handler(update: Update, context: ContextTypes.DEFAULT_T
         if not groups:
             text = "Групп пока нет."
         else:
-            text = "📋 *Список групп:*
+            text = """📋 *Список групп:*
 
-"
+"""
             for g in groups:
                 title = g.get("title", "Unknown")
                 chat_id = g.get("chat_id", "")
                 username = g.get("username", "")
                 uname = f"@{username}" if username else ""
-                text += f"• {title} {uname} `(ID: {chat_id})`
-"
+                text = text + f"• {title} {uname} `(ID: {chat_id})`" + chr(10)
         await query.edit_message_text(text, reply_markup=admin_menu_keyboard(), parse_mode="Markdown")
     elif data == "admin_allcampaigns":
         camps = db.get_all_campaigns()
         if not camps:
             text = "Кампаний пока нет."
         else:
-            text = "📢 *Все кампании:*
+            text = """📢 *Все кампании:*
 
-"
+"""
             for c in camps:
                 name = c.get("name", "")
                 cid = c.get("campaign_id", "")
                 owner = c.get("owner_id", "")
                 status = c.get("status", "")
-                text += f"• *{name}* `(ID: {cid})` — Владелец: `{owner}` — {status}
-"
+                text = text + f"• *{name}* `(ID: {cid})` — Владелец: `{owner}` — {status}" + chr(10)
         await query.edit_message_text(text, reply_markup=admin_menu_keyboard(), parse_mode="Markdown")
     elif data == "admin_stats":
         stats = db.get_all_stats()
@@ -106,23 +104,19 @@ async def admin_callback_handler(update: Update, context: ContextTypes.DEFAULT_T
         await query.edit_message_text(text, reply_markup=admin_menu_keyboard(), parse_mode="Markdown")
     elif data == "admin_broadcast":
         await query.edit_message_text(
-            "📣 *Рассылка*
-
-Отправьте сообщение для рассылки всем пользователям.",
+            "📣 *Рассылка*" + chr(10) + chr(10) + "Отправьте сообщение для рассылки всем пользователям.",
             parse_mode="Markdown"
         )
         context.user_data["admin_state"] = "broadcast"
     elif data == "admin_admins":
         users = db.get_all_users()
         admins = [u for u in users if u.get("is_admin") == "1"]
-        text = "👤 *Администраторы:*
+        text = """👤 *Администраторы:*
 
-"
+"""
         for a in admins:
-            text += f"• `{a.get('user_id', '')}` — {a.get('first_name', '')} @{a.get('username', '')}
-"
-        text += "
-Для назначения админом: `/setadmin @username`"
+            text = text + f"• `{a.get('user_id', '')}` — {a.get('first_name', '')} @{a.get('username', '')}" + chr(10)
+        text = text + chr(10) + "Для назначения админом: `/setadmin @username`"
         await query.edit_message_text(text, reply_markup=admin_menu_keyboard(), parse_mode="Markdown")
     elif data.startswith("rmgroup_"):
         chat_id = data.replace("rmgroup_", "")
@@ -201,6 +195,4 @@ async def broadcast_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await asyncio.sleep(0.05)
         except Exception:
             failed += 1
-    await msg.edit_text(f"✅ Рассылка завершена!
-Отправлено: {sent}
-Не удалось: {failed}", parse_mode="Markdown")
+    await msg.edit_text(f"✅ Рассылка завершена!" + chr(10) + f"Отправлено: {sent}" + chr(10) + f"Не удалось: {failed}", parse_mode="Markdown")
