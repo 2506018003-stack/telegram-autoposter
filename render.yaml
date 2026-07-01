@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: telegram-autoposter
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python bot.py
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: ADMIN_IDS
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: UPSTASH_REDIS_REST_URL
+        sync: false
+      - key: UPSTASH_REDIS_REST_TOKEN
+        sync: false
+      - key: WEBHOOK_URL
+        sync: false
+      - key: PYTHON_VERSION
+        value: 3.11.0
