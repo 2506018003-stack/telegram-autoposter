@@ -23,12 +23,13 @@ async def admin_panel(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text("⛔ Доступ запрещён.")
         return
 
-    text = ("🔐 *Админ-панель*\n\n"
-            "Выберите действие:")
+    text = "🔐 *Админ-панель*
+
+Выберите действие:"
     if query:
-        await query.edit_message_text(text, reply_markup=admin_menu_keyboard(), parse_mode="MarkdownV2")
+        await query.edit_message_text(text, reply_markup=admin_menu_keyboard(), parse_mode="Markdown")
     else:
-        await update.message.reply_text(text, reply_markup=admin_menu_keyboard(), parse_mode="MarkdownV2")
+        await update.message.reply_text(text, reply_markup=admin_menu_keyboard(), parse_mode="Markdown")
 
 async def admin_callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -42,11 +43,16 @@ async def admin_callback_handler(update: Update, context: ContextTypes.DEFAULT_T
 
     if data == "admin_addgroup":
         await query.edit_message_text(
-            "📋 *Добавление группы*\n\n"
-            "1\. Добавьте бота в группу/канал администратором\n"
-            "2\. Отправьте в группу команду `/addhere`\n\n"
+            "📋 *Добавление группы*
+
+"
+            "1. Добавьте бота в группу/канал администратором
+"
+            "2. Отправьте в группу команду `/addhere`
+
+"
             "Или перешлите мне любое сообщение из группы/канала.",
-            parse_mode="MarkdownV2"
+            parse_mode="Markdown"
         )
     elif data == "admin_removegroup":
         groups = db.get_all_groups()
@@ -62,53 +68,71 @@ async def admin_callback_handler(update: Update, context: ContextTypes.DEFAULT_T
         if not groups:
             text = "Групп пока нет."
         else:
-            text = "📋 *Список групп:*\n\n"
+            text = "📋 *Список групп:*
+
+"
             for g in groups:
                 title = g.get("title", "Unknown")
                 chat_id = g.get("chat_id", "")
                 username = g.get("username", "")
                 uname = f"@{username}" if username else ""
-                text += f"• {title} {uname} `\(ID: {chat_id}\)`\n"
-        await query.edit_message_text(text, reply_markup=admin_menu_keyboard(), parse_mode="MarkdownV2")
+                text += f"• {title} {uname} `(ID: {chat_id})`
+"
+        await query.edit_message_text(text, reply_markup=admin_menu_keyboard(), parse_mode="Markdown")
     elif data == "admin_allcampaigns":
         camps = db.get_all_campaigns()
         if not camps:
             text = "Кампаний пока нет."
         else:
-            text = "📢 *Все кампании:*\n\n"
+            text = "📢 *Все кампании:*
+
+"
             for c in camps:
                 name = c.get("name", "")
                 cid = c.get("campaign_id", "")
                 owner = c.get("owner_id", "")
                 status = c.get("status", "")
-                text += f"• *{name}* `\(ID: {cid}\)` — Владелец: `{owner}` — {status}\n"
-        await query.edit_message_text(text, reply_markup=admin_menu_keyboard(), parse_mode="MarkdownV2")
+                text += f"• *{name}* `(ID: {cid})` — Владелец: `{owner}` — {status}
+"
+        await query.edit_message_text(text, reply_markup=admin_menu_keyboard(), parse_mode="Markdown")
     elif data == "admin_stats":
         stats = db.get_all_stats()
         users = db.get_all_users()
         groups = db.get_all_groups()
         camps = db.get_all_campaigns()
-        text = (f"📊 *Общая статистика*\n\n"
-                f"👤 Пользователей: {len(users)}\n"
-                f"👥 Групп: {len(groups)}\n"
-                f"📢 Кампаний: {len(camps)}\n"
-                f"📨 Всего постов: {stats['total_posts']}\n"
+        text = (f"📊 *Общая статистика*
+
+"
+                f"👤 Пользователей: {len(users)}
+"
+                f"👥 Групп: {len(groups)}
+"
+                f"📢 Кампаний: {len(camps)}
+"
+                f"📨 Всего постов: {stats['total_posts']}
+"
                 f"✅ Успешно: {stats['successful']}")
-        await query.edit_message_text(text, reply_markup=admin_menu_keyboard(), parse_mode="MarkdownV2")
+        await query.edit_message_text(text, reply_markup=admin_menu_keyboard(), parse_mode="Markdown")
     elif data == "admin_broadcast":
         await query.edit_message_text(
-            "📣 *Рассылка*\n\nОтправьте сообщение для рассылки всем пользователям.",
-            parse_mode="MarkdownV2"
+            "📣 *Рассылка*
+
+Отправьте сообщение для рассылки всем пользователям.",
+            parse_mode="Markdown"
         )
         context.user_data["admin_state"] = "broadcast"
     elif data == "admin_admins":
         users = db.get_all_users()
         admins = [u for u in users if u.get("is_admin") == "1"]
-        text = "👤 *Администраторы:*\n\n"
+        text = "👤 *Администраторы:*
+
+"
         for a in admins:
-            text += f"• `{a.get('user_id', '')}` — {a.get('first_name', '')} @{a.get('username', '')}\n"
-        text += "\nДля назначения админом: `/setadmin @username`"
-        await query.edit_message_text(text, reply_markup=admin_menu_keyboard(), parse_mode="MarkdownV2")
+            text += f"• `{a.get('user_id', '')}` — {a.get('first_name', '')} @{a.get('username', '')}
+"
+        text += "
+Для назначения админом: `/setadmin @username`"
+        await query.edit_message_text(text, reply_markup=admin_menu_keyboard(), parse_mode="Markdown")
     elif data.startswith("rmgroup_"):
         chat_id = data.replace("rmgroup_", "")
         db.remove_group(int(chat_id))
@@ -186,4 +210,6 @@ async def broadcast_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await asyncio.sleep(0.05)
         except Exception:
             failed += 1
-    await msg.edit_text(f"✅ Рассылка завершена!\nОтправлено: {sent}\nНе удалось: {failed}", parse_mode="MarkdownV2")
+    await msg.edit_text(f"✅ Рассылка завершена!
+Отправлено: {sent}
+Не удалось: {failed}", parse_mode="Markdown")
