@@ -15,7 +15,7 @@ from scheduler import PostScheduler
 
 # Импорт хендлеров
 from handlers.user import (
-    start, help_command, menu_callback, camp_callback, schedule_callback,
+    start, help_command, guide_command, menu_callback, camp_callback, schedule_callback,
     text_handler, photo_handler, video_handler, spintax_callback,
     skip_media, newcampaign_command, mycampaigns_command
 )
@@ -45,6 +45,7 @@ def main():
     # --- Команды пользователя ---
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_command))
+    application.add_handler(CommandHandler("guide", guide_command))
     application.add_handler(CommandHandler("newcampaign", newcampaign_command))
     application.add_handler(CommandHandler("mycampaigns", mycampaigns_command))
 

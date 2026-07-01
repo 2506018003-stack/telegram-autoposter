@@ -6,6 +6,7 @@ def main_menu_keyboard(is_admin: bool = False):
         [InlineKeyboardButton("📋 Мои кампании", callback_data="menu_mycampaigns")],
         [InlineKeyboardButton("📅 Расписание", callback_data="menu_schedule")],
         [InlineKeyboardButton("📊 Статистика", callback_data="menu_stats")],
+        [InlineKeyboardButton("📖 Гайд", callback_data="menu_guide")],
         [InlineKeyboardButton("❓ Помощь", callback_data="menu_help")],
     ]
     if is_admin:
