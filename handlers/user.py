@@ -92,12 +92,10 @@ async def menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = query.from_user.id
 
     if data == "menu_newcampaign":
-        await query.edit_message_text(
-            "🚀 *Создание кампании*
+        text = """🚀 *Создание кампании*
 
-Введите название кампании:",
-            parse_mode="Markdown"
-        )
+Введите название кампании:"""
+        await query.edit_message_text(text, parse_mode="Markdown")
         context.user_data["state"] = "camp_name"
     elif data == "menu_mycampaigns":
         camps = db.get_user_campaigns(user_id)
@@ -127,10 +125,11 @@ async def menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.user_data["scheduling_camp"] = None
         context.user_data["schedule_days"] = []
         context.user_data["schedule_groups"] = []
-        await query.edit_message_text(
-            "📅 *Настройка расписания*
+        text = """📅 *Настройка расписания*
 
-Выберите кампанию:",
+Выберите кампанию:"""
+        await query.edit_message_text(
+            text,
             reply_markup=campaigns_keyboard(camps, "schedcamp"),
             parse_mode="Markdown"
         )
