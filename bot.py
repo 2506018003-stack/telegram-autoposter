@@ -40,6 +40,10 @@ async def post_init(app: Application):
     logger.info("Планировщик запущен")
 
 def main():
+    # Явное создание event loop для Python 3.12+
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+
     application = Application.builder().token(BOT_TOKEN).post_init(post_init).build()
 
     # --- Команды пользователя ---
