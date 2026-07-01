@@ -1,5 +1,4 @@
 import re
-import spintax
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes, ConversationTypes
 from config import is_admin

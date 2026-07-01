@@ -1,20 +1,14 @@
 import asyncio
-import spintax
 from datetime import datetime
 from telegram import Bot
 from telegram.error import TelegramError
 from database import db
+from spintax_utils import spin
 
 class PostScheduler:
     def __init__(self, bot: Bot):
         self.bot = bot
         self.running = False
-
-    def spin_text(self, text: str) -> str:
-        try:
-            return spintax.spin(text)
-        except Exception:
-            return text
 
     async def check_and_post(self):
         now = datetime.now()
@@ -43,7 +37,7 @@ class PostScheduler:
             chat_id = int(sched.get("chat_id", 0))
             text = campaign.get("text", "")
             if campaign.get("spintax_enabled") == "1":
-                text = self.spin_text(text)
+                text = spin(text)
 
             media_type = campaign.get("media_type", "")
             media_file_id = campaign.get("media_file_id", "")
