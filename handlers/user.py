@@ -5,78 +5,80 @@ from config import is_admin
 from database import db
 from keyboards import main_menu_keyboard, days_keyboard, groups_keyboard, campaigns_keyboard
 
-# Состояния ConversationHandler
 CAMP_NAME, CAMP_TEXT, CAMP_MEDIA, CAMP_SPINTAX = range(4)
 SCHEDULE_TIME = 5
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     db.add_user(user.id, user.username, user.first_name)
-    text = (f"👋 Привет, {user.first_name}!\n\n"
-            "🤖 *SMMPilot — Автопостинг в Telegram*\n\n"
-            "Создавайте кампании, настраивайте расписание публикаций, "
-            "управляйте группами и отслеживайте статистику.")
+    text = f"""👋 Привет, {user.first_name}!
+
+🤖 *SMMPilot — Автопостинг в Telegram*
+
+Создавайте кампании, настраивайте расписание публикаций, управляйте группами и отслеживайте статистику."""
     await update.message.reply_text(text, reply_markup=main_menu_keyboard(is_admin(user.id)), parse_mode="Markdown")
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    text = ("📖 *Помощь по боту*\n\n"
-            "*Команды пользователя:*\n"
-            "/start — Главное меню\n"
-            "/guide — Пошаговый гайд по работе\n"
-            "/newcampaign — Создать кампанию\n"
-            "/mycampaigns — Мои кампании\n"
-            "/schedule — Расписание\n"
-            "/stats — Статистика\n\n"
-            "*Команды администратора:*\n"
-            "/admin — Админ-панель\n"
-            "/addhere — Добавить текущую группу\n"
-            "/setadmin @username — Назначить админа\n"
-            "/removeadmin @username — Снять админа\n\n"
-            "*Spintax:*\n"
-            "Используйте `{вариант1|вариант2|вариант3}` для уникализации текста.")
+    text = """📖 *Помощь по боту*
+
+*Команды пользователя:*
+/start — Главное меню
+/guide — Пошаговый гайд по работе
+/newcampaign — Создать кампанию
+/mycampaigns — Мои кампании
+/schedule — Расписание
+/stats — Статистика
+
+*Команды администратора:*
+/admin — Админ-панель
+/addhere — Добавить текущую группу
+/setadmin @username — Назначить админа
+/removeadmin @username — Снять админа
+
+*Spintax:*
+Используйте `{вариант1|вариант2|вариант3}` для уникализации текста."""
     await update.message.reply_text(text, parse_mode="Markdown")
 
 async def guide_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    text = (
-        "📖 *Пошаговый гайд по работе с ботом*\n\n"
+    text = """📖 *Пошаговый гайд по работе с ботом*
 
-        "━━━━━━━━━━━━━━━━━━━━\n"
-        "🔄 *Как работает бот*\n"
-        "━━━━━━━━━━━━━━━━━━━━\n\n"
+━━━━━━━━━━━━━━━━━━━━
+🔄 *Как работает бот*
+━━━━━━━━━━━━━━━━━━━━
 
-        "*1️⃣ Создание кампании*\n"
-        "   ├ Нажмите 🚀 *Создать кампанию* или `/newcampaign`\n"
-        "   ├ Введите название кампании\n"
-        "   ├ Введите текст поста\n"
-        "   ├ Отправьте фото/видео или напишите *пропустить*\n"
-        "   └ Включите/выключите Spintax\n\n"
+*1️⃣ Создание кампании*
+   ├ Нажмите 🚀 *Создать кампанию* или `/newcampaign`
+   ├ Введите название кампании
+   ├ Введите текст поста
+   ├ Отправьте фото/видео или напишите *пропустить*
+   └ Включите/выключите Spintax
 
-        "*2️⃣ Настройка расписания*\n"
-        "   ├ Выберите кампанию → 📅 *Добавить расписание*\n"
-        "   ├ Выберите группы для публикации\n"
-        "   ├ Выберите дни недели (Пн, Вт, Ср...)\n"
-        "   └ Введите время, например `14:30`\n\n"
+*2️⃣ Настройка расписания*
+   ├ Выберите кампанию → 📅 *Добавить расписание*
+   ├ Выберите группы для публикации
+   ├ Выберите дни недели (Пн, Вт, Ср...)
+   └ Введите время, например `14:30`
 
-        "*3️⃣ Spintax — уникализация текста*\n"
-        "   Используйте `{вариант1|вариант2|вариант3}` в тексте.\n"
-        "   Бот случайно выберет один вариант при каждой публикации.\n\n"
+*3️⃣ Spintax — уникализация текста*
+   Используйте `{вариант1|вариант2|вариант3}` в тексте.
+   Бот случайно выберет один вариант при каждой публикации.
 
-        "*Пример:*\n"
-        "```\n"
-        "{Привет|Здравствуй|Добрый день}, {друзья|подписчики|все}!\n"
-        "Сегодня у нас {акция|спецпредложение|скидка}!\n"
-        "```\n\n"
+*Пример:*
+```
+{Привет|Здравствуй|Добрый день}, {друзья|подписчики|все}!
+Сегодня у нас {акция|спецпредложение|скидка}!
+```
 
-        "━━━━━━━━━━━━━━━━━━━━\n"
-        "*💡 Полезные советы*\n"
-        "━━━━━━━━━━━━━━━━━━━━\n\n"
-        "• Кампании можно редактировать только через удаление и создание новой\n"
-        "• Статистика обновляется в реальном времени\n"
-        "• Для работы бот должен быть администратором в группе/канале\n"
-        "• Расписание проверяется каждые 30 секунд\n\n"
+━━━━━━━━━━━━━━━━━━━━
+💡 *Полезные советы*
+━━━━━━━━━━━━━━━━━━━━
 
-        "❓ Есть вопросы? Напишите `/help`"
-    )
+• Кампании можно редактировать только через удаление и создание новой
+• Статистика обновляется в реальном времени
+• Для работы бот должен быть администратором в группе/канале
+• Расписание проверяется каждые 30 секунд
+
+❓ Есть вопросы? Напишите `/help`"""
     await update.message.reply_text(
         text, 
         reply_markup=main_menu_keyboard(is_admin(update.effective_user.id)),
@@ -91,7 +93,9 @@ async def menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if data == "menu_newcampaign":
         await query.edit_message_text(
-            "🚀 *Создание кампании*\n\nВведите название кампании:",
+            "🚀 *Создание кампании*
+
+Введите название кампании:",
             parse_mode="Markdown"
         )
         context.user_data["state"] = "camp_name"
@@ -103,13 +107,17 @@ async def menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 reply_markup=main_menu_keyboard(is_admin(user_id))
             )
             return
-        text = "📋 *Ваши кампании:*\n\n"
+        text = "📋 *Ваши кампании:*
+
+"
         for c in camps:
             name = c.get("name", "")
             cid = c.get("campaign_id", "")
             status = c.get("status", "")
-            text += f"• *{name}* `(ID: {cid})` — {status}\n"
-        text += "\nВыберите кампанию для управления:"
+            text += f"• *{name}* `(ID: {cid})` — {status}
+"
+        text += "
+Выберите кампанию для управления:"
         await query.edit_message_text(text, reply_markup=campaigns_keyboard(camps, "camp"), parse_mode="Markdown")
     elif data == "menu_schedule":
         camps = db.get_user_campaigns(user_id)
@@ -120,7 +128,9 @@ async def menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.user_data["schedule_days"] = []
         context.user_data["schedule_groups"] = []
         await query.edit_message_text(
-            "📅 *Настройка расписания*\n\nВыберите кампанию:",
+            "📅 *Настройка расписания*
+
+Выберите кампанию:",
             reply_markup=campaigns_keyboard(camps, "schedcamp"),
             parse_mode="Markdown"
         )
@@ -129,46 +139,55 @@ async def menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not camps:
             await query.edit_message_text("У вас нет кампаний для статистики.", reply_markup=main_menu_keyboard(is_admin(user_id)))
             return
-        text = "📊 *Статистика по кампаниям:*\n\n"
+        text = "📊 *Статистика по кампаниям:*
+
+"
         for c in camps:
             stats = db.get_stats(c["campaign_id"])
-            text += (f"• *{c['name']}*\n"
-                     f"  Всего: {stats['total']} | ✅ {stats['success']} | ❌ {stats['failed']}\n")
+            text += f"• *{c['name']}*
+  Всего: {stats['total']} | ✅ {stats['success']} | ❌ {stats['failed']}
+"
         await query.edit_message_text(text, reply_markup=main_menu_keyboard(is_admin(user_id)), parse_mode="Markdown")
     elif data == "menu_guide":
-        text = (
-            "📖 *Пошаговый гайд по работе с ботом*\n\n"
-            "━━━━━━━━━━━━━━━━━━━━\n"
-            "🔄 *Как работает бот*\n"
-            "━━━━━━━━━━━━━━━━━━━━\n\n"
-            "*1️⃣ Создание кампании*\n"
-            "   ├ Нажмите 🚀 *Создать кампанию* или `/newcampaign`\n"
-            "   ├ Введите название кампании\n"
-            "   ├ Введите текст поста\n"
-            "   ├ Отправьте фото/видео или напишите *пропустить*\n"
-            "   └ Включите/выключите Spintax\n\n"
-            "*2️⃣ Настройка расписания*\n"
-            "   ├ Выберите кампанию → 📅 *Добавить расписание*\n"
-            "   ├ Выберите группы для публикации\n"
-            "   ├ Выберите дни недели (Пн, Вт, Ср...)\n"
-            "   └ Введите время, например `14:30`\n\n"
-            "*3️⃣ Spintax — уникализация текста*\n"
-            "   Используйте `{вариант1|вариант2|вариант3}` в тексте.\n"
-            "   Бот случайно выберет один вариант при каждой публикации.\n\n"
-            "*Пример:*\n"
-            "```\n"
-            "{Привет|Здравствуй|Добрый день}, {друзья|подписчики|все}!\n"
-            "Сегодня у нас {акция|спецпредложение|скидка}!\n"
-            "```\n\n"
-            "━━━━━━━━━━━━━━━━━━━━\n"
-            "*💡 Полезные советы*\n"
-            "━━━━━━━━━━━━━━━━━━━━\n\n"
-            "• Кампании можно редактировать только через удаление и создание новой\n"
-            "• Статистика обновляется в реальном времени\n"
-            "• Для работы бот должен быть администратором в группе/канале\n"
-            "• Расписание проверяется каждые 30 секунд\n\n"
-            "❓ Есть вопросы? Напишите `/help`"
-        )
+        text = """📖 *Пошаговый гайд по работе с ботом*
+
+━━━━━━━━━━━━━━━━━━━━
+🔄 *Как работает бот*
+━━━━━━━━━━━━━━━━━━━━
+
+*1️⃣ Создание кампании*
+   ├ Нажмите 🚀 *Создать кампанию* или `/newcampaign`
+   ├ Введите название кампании
+   ├ Введите текст поста
+   ├ Отправьте фото/видео или напишите *пропустить*
+   └ Включите/выключите Spintax
+
+*2️⃣ Настройка расписания*
+   ├ Выберите кампанию → 📅 *Добавить расписание*
+   ├ Выберите группы для публикации
+   ├ Выберите дни недели (Пн, Вт, Ср...)
+   └ Введите время, например `14:30`
+
+*3️⃣ Spintax — уникализация текста*
+   Используйте `{вариант1|вариант2|вариант3}` в тексте.
+   Бот случайно выберет один вариант при каждой публикации.
+
+*Пример:*
+```
+{Привет|Здравствуй|Добрый день}, {друзья|подписчики|все}!
+Сегодня у нас {акция|спецпредложение|скидка}!
+```
+
+━━━━━━━━━━━━━━━━━━━━
+💡 *Полезные советы*
+━━━━━━━━━━━━━━━━━━━━
+
+• Кампании можно редактировать только через удаление и создание новой
+• Статистика обновляется в реальном времени
+• Для работы бот должен быть администратором в группе/канале
+• Расписание проверяется каждые 30 секунд
+
+❓ Есть вопросы? Напишите `/help`"""
         await query.edit_message_text(
             text,
             reply_markup=main_menu_keyboard(is_admin(user_id)),
@@ -198,12 +217,14 @@ async def camp_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not camp:
             await query.edit_message_text("Кампания не найдена.")
             return
-        text = (f"📢 *{camp['name']}*\n\n"
-                f"Текст: `{camp['text'][:100]}...`\n"
-                f"Spintax: {'Да' if camp['spintax_enabled'] == '1' else 'Нет'}\n"
-                f"Медиа: {camp['media_type'] or 'Нет'}\n"
-                f"Статус: {camp['status']}\n\n"
-                f"Выберите действие:")
+        text = f"""📢 *{camp['name']}*
+
+Текст: `{camp['text'][:100]}...`
+Spintax: {'Да' if camp['spintax_enabled'] == '1' else 'Нет'}
+Медиа: {camp['media_type'] or 'Нет'}
+Статус: {camp['status']}
+
+Выберите действие:"""
         buttons = [
             [InlineKeyboardButton("📅 Добавить расписание", callback_data=f"addsched_{cid}")],
             [InlineKeyboardButton("📊 Статистика", callback_data=f"campstats_{cid}")],
@@ -227,7 +248,11 @@ async def camp_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif data.startswith("campstats_"):
         cid = data.replace("campstats_", "")
         stats = db.get_stats(cid)
-        text = f"📊 *Статистика кампании*\n\nВсего: {stats['total']}\n✅ Успешно: {stats['success']}\n❌ Ошибок: {stats['failed']}"
+        text = f"📊 *Статистика кампании*
+
+Всего: {stats['total']}
+✅ Успешно: {stats['success']}
+❌ Ошибок: {stats['failed']}"
         await query.edit_message_text(text, reply_markup=main_menu_keyboard(is_admin(user_id)), parse_mode="Markdown")
     elif data.startswith("delcamp_"):
         cid = data.replace("delcamp_", "")
@@ -328,7 +353,9 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.user_data["schedule_days"] = []
         context.user_data["schedule_groups"] = []
         await update.message.reply_text(
-            f"✅ Расписание сохранено!\nДни: {', '.join(days)}\nВремя: {time_str}",
+            f"✅ Расписание сохранено!
+Дни: {', '.join(days)}
+Время: {time_str}",
             reply_markup=main_menu_keyboard(is_admin(user.id))
         )
     elif state == "broadcast":
@@ -354,7 +381,8 @@ async def video_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def ask_spintax(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["state"] = "camp_spintax"
     await update.message.reply_text(
-        "🔄 Использовать Spintax для уникализации текста?\n"
+        "🔄 Использовать Spintax для уникализации текста?
+"
         "(Пример: `{Привет|Здравствуй|Добрый день}, {мир|друзья}!`)",
         reply_markup=InlineKeyboardMarkup([
             [InlineKeyboardButton("✅ Да", callback_data="spintax_yes"),
@@ -387,7 +415,10 @@ async def spintax_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["camp_media_file_id"] = None
 
     await query.edit_message_text(
-        f"✅ Кампания *{name}* создана!\nID: `{cid}`\n\nТеперь настройте расписание публикаций.",
+        f"✅ Кампания *{name}* создана!
+ID: `{cid}`
+
+Теперь настройте расписание публикаций.",
         reply_markup=main_menu_keyboard(is_admin(user_id)),
         parse_mode="Markdown"
     )
@@ -401,7 +432,9 @@ async def skip_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def newcampaign_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data["state"] = "camp_name"
-    await update.message.reply_text("🚀 *Создание кампании*\n\nВведите название кампании:", parse_mode="Markdown")
+    await update.message.reply_text("🚀 *Создание кампании*
+
+Введите название кампании:", parse_mode="Markdown")
 
 async def mycampaigns_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
@@ -409,7 +442,10 @@ async def mycampaigns_command(update: Update, context: ContextTypes.DEFAULT_TYPE
     if not camps:
         await update.message.reply_text("У вас пока нет кампаний.")
         return
-    text = "📋 *Ваши кампании:*\n\n"
+    text = "📋 *Ваши кампании:*
+
+"
     for c in camps:
-        text += f"• *{c['name']}* `(ID: {c['campaign_id']})` — {c['status']}\n"
+        text += f"• *{c['name']}* `(ID: {c['campaign_id']})` — {c['status']}
+"
     await update.message.reply_text(text, parse_mode="Markdown")

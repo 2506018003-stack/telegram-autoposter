@@ -5,7 +5,6 @@ from config import is_admin
 from database import db
 from keyboards import admin_menu_keyboard, groups_keyboard
 
-# Состояния для ConversationHandler
 ADMIN_BROADCAST = 1
 
 async def admin_panel(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -23,9 +22,9 @@ async def admin_panel(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text("⛔ Доступ запрещён.")
         return
 
-    text = "🔐 *Админ-панель*
+    text = """🔐 *Админ-панель*
 
-Выберите действие:"
+Выберите действие:"""
     if query:
         await query.edit_message_text(text, reply_markup=admin_menu_keyboard(), parse_mode="Markdown")
     else:
@@ -43,15 +42,12 @@ async def admin_callback_handler(update: Update, context: ContextTypes.DEFAULT_T
 
     if data == "admin_addgroup":
         await query.edit_message_text(
-            "📋 *Добавление группы*
+            """📋 *Добавление группы*
 
-"
-            "1. Добавьте бота в группу/канал администратором
-"
-            "2. Отправьте в группу команду `/addhere`
+1. Добавьте бота в группу/канал администратором
+2. Отправьте в группу команду `/addhere`
 
-"
-            "Или перешлите мне любое сообщение из группы/канала.",
+Или перешлите мне любое сообщение из группы/канала.""",
             parse_mode="Markdown"
         )
     elif data == "admin_removegroup":
@@ -100,18 +96,13 @@ async def admin_callback_handler(update: Update, context: ContextTypes.DEFAULT_T
         users = db.get_all_users()
         groups = db.get_all_groups()
         camps = db.get_all_campaigns()
-        text = (f"📊 *Общая статистика*
+        text = f"""📊 *Общая статистика*
 
-"
-                f"👤 Пользователей: {len(users)}
-"
-                f"👥 Групп: {len(groups)}
-"
-                f"📢 Кампаний: {len(camps)}
-"
-                f"📨 Всего постов: {stats['total_posts']}
-"
-                f"✅ Успешно: {stats['successful']}")
+👤 Пользователей: {len(users)}
+👥 Групп: {len(groups)}
+📢 Кампаний: {len(camps)}
+📨 Всего постов: {stats['total_posts']}
+✅ Успешно: {stats['successful']}"""
         await query.edit_message_text(text, reply_markup=admin_menu_keyboard(), parse_mode="Markdown")
     elif data == "admin_broadcast":
         await query.edit_message_text(
