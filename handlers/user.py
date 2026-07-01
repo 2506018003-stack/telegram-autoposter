@@ -1,6 +1,6 @@
 import re
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import ContextTypes, ConversationTypes
+from telegram.ext import ContextTypes
 from config import is_admin
 from database import db
 from keyboards import main_menu_keyboard, days_keyboard, groups_keyboard, campaigns_keyboard

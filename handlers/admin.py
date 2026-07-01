@@ -1,6 +1,6 @@
 import asyncio
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import ContextTypes, ConversationTypes
+from telegram.ext import ContextTypes
 from config import is_admin
 from database import db
 from keyboards import admin_menu_keyboard, groups_keyboard
