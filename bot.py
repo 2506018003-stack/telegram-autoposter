@@ -12,6 +12,9 @@ from telegram.ext import (
 )
 from config import BOT_TOKEN, WEBHOOK_URL, PORT
 from scheduler import PostScheduler
+from web_server import create_web_app
+from aiohttp import web
+import threading
 
 # Импорт хендлеров
 from handlers.user import (
@@ -75,14 +78,45 @@ def main():
     # --- Запуск ---
     if WEBHOOK_URL:
         logger.info(f"Запуск в режиме Webhook: {WEBHOOK_URL}")
-        application.run_webhook(
-            listen="0.0.0.0",
-            port=PORT,
-            webhook_url=WEBHOOK_URL,
-        )
+        # Создаём aiohttp приложение для веб-эндпоинтов
+        web_app = create_web_app()
+
+        # Добавляем webhook endpoint
+        webhook_path = "/webhook"
+        web_app.router.add_post(webhook_path, lambda request: handle_webhook(request, application))
+
+        # Запускаем aiohttp сервер
+        runner = web.AppRunner(web_app)
+        loop.run_until_complete(runner.setup())
+        site = web.TCPSite(runner, "0.0.0.0", PORT)
+        loop.run_until_complete(site.start())
+
+        # Устанавливаем webhook в Telegram
+        loop.run_until_complete(application.bot.set_webhook(f"{WEBHOOK_URL}{webhook_path}"))
+
+        # Запускаем PTB
+        loop.run_until_complete(application.initialize())
+        loop.run_until_complete(application.start())
+
+        logger.info(f"Сервер запущен на порту {PORT}")
+
+        # Держим сервер активным
+        try:
+            loop.run_forever()
+        except KeyboardInterrupt:
+            pass
+        finally:
+            loop.run_until_complete(application.stop())
+            loop.run_until_complete(runner.cleanup())
     else:
         logger.info("Запуск в режиме Polling")
         application.run_polling(allowed_updates=Update.ALL_TYPES)
+
+async def handle_webhook(request, application):
+    data = await request.json()
+    update = Update.de_json(data, application.bot)
+    await application.process_update(update)
+    return web.Response()
 
 if __name__ == "__main__":
     main()
