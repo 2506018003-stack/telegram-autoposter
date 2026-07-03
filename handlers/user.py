@@ -47,7 +47,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 3. Создай кампанию с текстом (и, если нужно, spintax)
 4. Настрой расписание: дни недели + время — бот будет публиковать автоматически
 5. Следи за статистикой в /mycampaigns или CRM"""
-    await update.message.reply_text(text, parse_mode="Markdown")
+    await update.effective_message.reply_text(text, parse_mode="Markdown")
 
 async def crm_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not MINIAPP_URL:
