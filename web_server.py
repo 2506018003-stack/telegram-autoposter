@@ -1,9 +1,15 @@
 from aiohttp import web
 from datetime import datetime, timezone
 import json
+import os
 
 from database import db
 from webapp_auth import validate_init_data
+
+MINIAPP_INDEX = os.path.join(os.path.dirname(__file__), "miniapp", "index.html")
+
+async def miniapp_index_handler(request):
+    return web.FileResponse(MINIAPP_INDEX)
 
 async def health_handler(request):
     return web.json_response({
@@ -141,5 +147,7 @@ def create_web_app():
     app.router.add_get("/api/groups", api_groups_list)
     app.router.add_get("/api/stats", api_stats)
 
-    app.router.add_static("/miniapp", path="miniapp", name="miniapp", show_index=True)
+    app.router.add_get("/miniapp", miniapp_index_handler)
+    app.router.add_get("/miniapp/", miniapp_index_handler)
+    app.router.add_static("/miniapp", path="miniapp", name="miniapp")
     return app
