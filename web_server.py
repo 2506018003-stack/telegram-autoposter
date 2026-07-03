@@ -1,11 +1,12 @@
 from aiohttp import web
+from datetime import datetime, timezone
 import json
 
 async def health_handler(request):
     return web.json_response({
         "status": "ok",
         "service": "telegram-autoposter",
-        "timestamp": "2026-07-01"
+        "timestamp": datetime.now(timezone.utc).isoformat()
     })
 
 async def root_handler(request):
