@@ -1,7 +1,11 @@
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
+from config import MINIAPP_URL
 
 def main_menu_keyboard(is_admin: bool = False):
-    buttons = [
+    buttons = []
+    if MINIAPP_URL:
+        buttons.append([InlineKeyboardButton("🖥 Открыть CRM", web_app=WebAppInfo(url=MINIAPP_URL))])
+    buttons += [
         [InlineKeyboardButton("🚀 Создать кампанию", callback_data="menu_newcampaign")],
         [InlineKeyboardButton("📋 Мои кампании", callback_data="menu_mycampaigns")],
         [InlineKeyboardButton("📅 Расписание", callback_data="menu_schedule")],

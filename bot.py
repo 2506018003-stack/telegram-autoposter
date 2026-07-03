@@ -18,7 +18,7 @@ import threading
 
 # Импорт хендлеров
 from handlers.user import (
-    start, help_command, guide_command, menu_callback, camp_callback, schedule_callback,
+    start, help_command, guide_command, crm_command, menu_callback, camp_callback, schedule_callback,
     text_handler, photo_handler, video_handler, spintax_callback,
     skip_media, newcampaign_command, mycampaigns_command
 )
@@ -55,6 +55,7 @@ def main():
     application.add_handler(CommandHandler("guide", guide_command))
     application.add_handler(CommandHandler("newcampaign", newcampaign_command))
     application.add_handler(CommandHandler("mycampaigns", mycampaigns_command))
+    application.add_handler(CommandHandler("crm", crm_command))
 
     # --- Команды администратора ---
     application.add_handler(CommandHandler("admin", admin_panel))

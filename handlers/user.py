@@ -1,7 +1,7 @@
 import re
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 from telegram.ext import ContextTypes
-from config import is_admin
+from config import is_admin, MINIAPP_URL
 from database import db
 from keyboards import main_menu_keyboard, days_keyboard, groups_keyboard, campaigns_keyboard
 
@@ -19,25 +19,42 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(text, reply_markup=main_menu_keyboard(is_admin(user.id)), parse_mode="Markdown")
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    text = """📖 *Помощь по боту*
+    text = """📖 *Помощь по SMMPilot*
 
-*Команды пользователя:*
+*Команды:*
 /start — Главное меню
+/crm — Открыть CRM (Mini App): кампании, расписания, статистика в одном экране
 /guide — Пошаговый гайд по работе
-/newcampaign — Создать кампанию
-/mycampaigns — Мои кампании
-/schedule — Расписание
-/stats — Статистика
+/newcampaign — Создать кампанию (пошагово через диалог с ботом)
+/mycampaigns — Мои кампании (список + расписание/статистика через кнопки)
+
+*"📅 Расписание" и "📊 Статистика" в главном меню* — это кнопки, не команды. Открой /start и нажми на нужную.
 
 *Команды администратора:*
-/admin — Админ-панель
-/addhere — Добавить текущую группу
+/admin — Админ-панель (группы, все кампании, рассылка)
+/addhere — Добавить текущую группу (отправь прямо в группе)
 /setadmin @username — Назначить админа
 /removeadmin @username — Снять админа
 
-*Spintax:*
-Используйте `{вариант1|вариант2|вариант3}` для уникализации текста."""
+*Spintax (уникализация текста):*
+Используйте `{вариант1|вариант2|вариант3}` в тексте кампании — бот случайно выберет один вариант при каждой публикации, чтобы посты не выглядели как дубликаты.
+
+*CRM (Mini App)* дублирует управление кампаниями и расписанием в удобном веб-интерфейсе прямо в Telegram — доступна по кнопке "🖥 Открыть CRM" в /start или командой /crm. Медиа (фото/видео) к кампании пока добавляется только через диалог с ботом (/newcampaign), CRM — для текстовых кампаний, расписаний и статистики.
+
+*Как это работает:*
+1. Добавь бота админом в свою группу/канал
+2. Напиши в этой группе /addhere — бот запомнит её
+3. Создай кампанию с текстом (и, если нужно, spintax)
+4. Настрой расписание: дни недели + время — бот будет публиковать автоматически
+5. Следи за статистикой в /mycampaigns или CRM"""
     await update.message.reply_text(text, parse_mode="Markdown")
+
+async def crm_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not MINIAPP_URL:
+        await update.message.reply_text("⚠️ CRM временно недоступна (не настроен MINIAPP_URL).")
+        return
+    kb = InlineKeyboardMarkup([[InlineKeyboardButton("🖥 Открыть CRM", web_app=WebAppInfo(url=MINIAPP_URL))]])
+    await update.message.reply_text("Панель управления кампаниями, расписанием и статистикой:", reply_markup=kb)
 
 async def guide_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = """📖 *Пошаговый гайд по работе с ботом*
